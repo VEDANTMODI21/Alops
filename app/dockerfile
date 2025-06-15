@@ -1,0 +1,95 @@
+vedant-modi@vedant-modi:~/ood-docker/ondemand/apps/dashboard$ nano dockerfile
+vedant-modi@vedant-modi:~/ood-docker/ondemand/apps/dashboard$ docker build --no-cache -t custom-ondemand .
+[+] Building 117.5s (11/11) FINISHED                                        docker:default
+ => [internal] load build definition from Dockerfile                                  0.0s
+ => => transferring dockerfile: 899B                                                  0.0s
+ => [internal] load metadata for docker.io/library/ruby:3.3                           8.3s
+ => [internal] load .dockerignore                                                     0.0s
+ => => transferring context: 2B                                                       0.0s
+ => CACHED [1/7] FROM docker.io/library/ruby:3.3@sha256:6b7f4a1624ddd8d958277e16d7b8  0.0s
+ => [internal] load build context                                                     0.2s
+ => => transferring context: 1.06MB                                                   0.2s
+ => [2/7] RUN apt-get update -qq &&     apt-get install -y build-essential nodejs y  29.3s
+ => [3/7] WORKDIR /app                                                                0.0s 
+ => [4/7] COPY Gemfile Gemfile.lock ./                                                0.1s 
+ => [5/7] RUN bundle install                                                         79.0s 
+ => [6/7] COPY . .                                                                    0.6s 
+ => ERROR [7/7] RUN bundle exec rake assets:precompile                                0.3s 
+------                                                                                     
+ > [7/7] RUN bundle exec rake assets:precompile:                                           
+0.244 bundler: failed to load command: rake (/usr/local/bundle/bin/rake)                   
+0.244 /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/definition.rb:605:in `materialize': Could not find nokogiri-1.14.5-x86_64-linux in locally installed gems (Bundler::GemNotFound)
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/definition.rb:201:in `specs'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/definition.rb:268:in `specs_for'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/runtime.rb:18:in `setup'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler.rb:164:in `setup'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/setup.rb:32:in `block in <top (required)>'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/ui/shell.rb:173:in `with_level'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/ui/shell.rb:119:in `silence'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/setup.rb:32:in `<top (required)>'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/cli/exec.rb:56:in `require_relative'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/cli/exec.rb:56:in `kernel_load'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/cli/exec.rb:23:in `run'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/cli.rb:456:in `exec'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/vendor/thor/lib/thor/command.rb:28:in `run'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/vendor/thor/lib/thor/invocation.rb:127:in `invoke_command'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/vendor/thor/lib/thor.rb:527:in `dispatch'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/cli.rb:35:in `dispatch'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/vendor/thor/lib/thor/base.rb:584:in `start'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/cli.rb:29:in `start'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/exe/bundle:28:in `block in <top (required)>'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/lib/bundler/friendly_errors.rb:117:in `with_friendly_errors'
+0.244 	from /usr/local/bundle/gems/bundler-2.5.23/exe/bundle:20:in `<top (required)>'
+0.244 	from /usr/local/bundle/bin/bundle:25:in `load'
+0.244 	from /usr/local/bundle/bin/bundle:25:in `<main>'
+------
+Dockerfile:18
+--------------------
+  16 |     
+  17 |     # Precompile assets
+  18 | >>> RUN bundle exec rake assets:precompile
+  19 |     
+  20 |     # Start Rails server
+--------------------
+ERROR: failed to solve: process "/bin/sh -c bundle exec rake assets:precompile" did not complete successfully: exit code: 1
+# Use official Ruby image
+# Use official Ruby image
+FROM ruby:3.3
+
+# Install system dependencies
+RUN apt-get update -qq && apt-get install -y \
+    build-essential \
+    libpq-dev \
+    nodejs \
+    yarn \
+    libxml2-dev \
+    libxslt1-dev \
+    zlib1g-dev \
+    pkg-config \
+    git \
+    curl
+
+# Set environment variables
+ENV NOKOGIRI_USE_SYSTEM_LIBRARIES=true
+ENV BUNDLE_FORCE_RUBY_PLATFORM=true
+
+# Set working directory
+WORKDIR /app
+
+# Copy gem files first
+COPY Gemfile Gemfile.lock ./
+
+# Install dependencies
+RUN gem install bundler -v 2.6.9
+RUN bundle config set force_ruby_platform true
+RUN bundle install
+
+# Copy the app code
+COPY . .
+
+# Precompile assets
+RUN bundle exec rake assets:precompile
+
+# Start the server
+CMD ["rails", "server", "-b", "0.0.0.0"]
+

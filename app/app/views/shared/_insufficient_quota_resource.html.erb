@@ -1,0 +1,24 @@
+<div class="alert-heading h4">
+  <strong><%= t('dashboard.quota_warning_prefix_html') %></strong>
+  <span>
+    <%= link_to OodAppkit.files.url(path: quota.path).to_s, class: "text-danger", target: "_blank" do %>
+      <strong><%= quota.path %></strong>
+    <%- end -%>
+  </span>
+</div>
+<ul class="list-unstyled mb-2">
+  <li>
+    <%= quota.to_s %><%= ". #{t('dashboard.quota_additional_message')}" %>
+  </li>
+  <li>
+    <%=
+      render(
+        partial: "shared/insufficient_quota_progress_bar",
+        locals: { percent: quota.percent_total_usage }
+      )
+    %>
+  </li>
+</ul>
+<div class="text-muted hidden-xs hidden-sm mb-3">
+  <%= t('dashboard.quota_reload_message') %>
+</div>

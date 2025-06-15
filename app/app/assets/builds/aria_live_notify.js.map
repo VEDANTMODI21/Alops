@@ -1,0 +1,7 @@
+{
+  "version": 3,
+  "sources": ["../../javascript/aria_live_notify.js"],
+  "sourcesContent": ["\nexport function ariaNotify(message) {\n  const liveRegion = document.getElementById(\"aria_live_region\");\n\n  if(liveRegion) {\n    liveRegion.textContent = message;\n  }\n}"],
+  "mappings": ";AACO,SAAS,WAAW,SAAS;AAClC,QAAM,aAAa,SAAS,eAAe,kBAAkB;AAE7D,MAAG,YAAY;AACb,eAAW,cAAc;AAAA,EAC3B;AACF;",
+  "names": []
+}
