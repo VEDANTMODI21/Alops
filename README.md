@@ -50,6 +50,8 @@ Practical exposure to Linux-based cluster environments
 
 Acknowledgements:
 
-IIT Hyderabad (IITH)
-Open OnDemand Community
-SLURM Workload Manager
+IIT Hyderabad (IITH),
+
+Open OnDemand Community,
+
+SLURM Workload Manager.
